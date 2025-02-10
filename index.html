@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion de budgetBudget</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Gestion de Budget</h1>
+        
+        <!-- Champ de revenu fixe -->
+        <div class="form-container">
+            <label>Revenu Fixe (€)</label>
+            <input type="number" id="fixedIncome" placeholder="Entrer le revenu">
+        </div>
+        
+        <!-- Revenu Final -->
+        <div class="form-container">
+            <h2>Revenu Final: <span id="finalIncome">0</span> €</h2>
+        </div>
+        
+        <!-- Ajout d'une nouvelle enveloppe -->
+        <div class="form-container">
+            <input type="text" id="newEnvelopeName" placeholder="Nom de l'enveloppe">
+            <button onclick="addEnvelope()">Ajouter une Enveloppe</button>
+        </div>
+
+        <!-- Liste des enveloppes -->
+        <div id="allocationFields"></div>
+
+        <!-- Dépenses -->
+        <div class="form-container">
+            <select id="expenseEnvelope"></select>
+            <input type="number" id="expenseAmount" placeholder="Montant">
+            <button onclick="addExpense()">Dépenser</button>
+        </div>
+
+        <!-- Historique des Transactions -->
+        <h2>📜 Historique des Transactions</h2>
+        <ul id="transactionHistory"></ul>
+
+        <!-- Graphique -->
+        <div class="chart-container">
+            <canvas id="budgetChart"></canvas>
+        </div>
+        
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
