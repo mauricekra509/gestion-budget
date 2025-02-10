@@ -8,29 +8,37 @@ document.addEventListener("DOMContentLoaded", loadBudget);
 async function loadBudget() {
     const allocationFields = document.getElementById("allocationFields");
     const expenseSelect = document.getElementById("expenseEnvelope");
-    allocationFields.innerHTML = "";
+
+    allocationFields.innerHTML = "";  // 🔹 Vider les enveloppes avant d'ajouter
     expenseSelect.innerHTML = "";
 
     try {
-        const response = await fetch(API_URL); // Récupérer les données MockAPI
-        envelopes = await response.json(); // Convertir en JSON
+        const response = await fetch(API_URL);
+        envelopes = await response.json();
 
+        // 🔹 Vérification pour éviter les doublons
+        const existingIds = new Set();
         envelopes.forEach((env, index) => {
-            allocationFields.innerHTML += `
-                <div class="envelope">
-                    <label>${env.name}</label>
-                    <input type="number" id="alloc-${index}" value="${env.amount}" oninput="updateEnvelope(${env.id})">
-                    <button onclick="deleteEnvelope(${env.id})">❌</button>
-                </div>
-            `;
-            expenseSelect.innerHTML += `<option value="${env.id}">${env.name}</option>`;
+            if (!existingIds.has(env.id)) {
+                existingIds.add(env.id);
+                
+                allocationFields.innerHTML += `
+                    <div class="envelope">
+                        <label>${env.name}</label>
+                        <input type="number" id="alloc-${index}" value="${env.amount}" oninput="updateEnvelope(${env.id})">
+                        <button onclick="deleteEnvelope(${env.id})">❌</button>
+                    </div>
+                `;
+                expenseSelect.innerHTML += `<option value="${env.id}">${env.name}</option>`;
+            }
         });
 
-        updateChart();
+        updateFinalIncome(); // Mettre à jour le revenu final
     } catch (error) {
         console.error("Erreur lors du chargement des enveloppes", error);
     }
 }
+
 
 // 🔹 Fonction pour ajouter une nouvelle enveloppe
 async function addEnvelope() {
@@ -83,7 +91,7 @@ async function addExpense() {
                 body: JSON.stringify(envelope)
             });
 
-            loadBudget();
+            loadBudget();  // 🔹 Recharger l'affichage après modification
         } else {
             alert("Fonds insuffisants.");
         }
@@ -91,6 +99,26 @@ async function addExpense() {
         console.error("Erreur lors de la dépense", error);
     }
 }
+
+
+async function updateFinalIncome() {
+    const fixedIncome = parseFloat(document.getElementById("fixedIncome").value) || 0;
+    
+    try {
+        const response = await fetch(API_URL);
+        const envelopes = await response.json();
+
+        const totalAllocated = envelopes.reduce((sum, env) => sum + env.amount, 0);
+        const finalIncome = fixedIncome - totalAllocated;
+
+        document.getElementById("finalIncome").textContent = finalIncome + " €";
+    } catch (error) {
+        console.error("Erreur lors du calcul du revenu final :", error);
+    }
+}
+
+// Assurez-vous que l'événement "input" est bien attaché au champ de revenu fixe
+document.getElementById("fixedIncome").addEventListener("input", updateFinalIncome);
 
 // 🔹 Fonction pour mettre à jour le graphique
 function updateChart() {
